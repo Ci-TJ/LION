@@ -962,7 +962,10 @@ Internal.randomForest_CV <- function(datasets = list(), all_folds, label.col = 1
                 RF_mod <- randomForest::randomForest(label ~ ., data = trainSet,
                                                      ntree = ntree, ...)
                 res <- predict(RF_mod, testSet, type = "response")
-
+                #AUC by Seager
+                roc_obj <- pROC::roc(testSet$label, res, levels = c(positive.class, "other"))
+                res.auc <- pROCauc(roc_obj)
+                
                 confusion.res <- caret::confusionMatrix(data.frame(res)[,1], testSet$label,
                                                         positive = positive.class,
                                                         mode = "everything")
@@ -984,13 +987,18 @@ Internal.randomForest_CV <- function(datasets = list(), all_folds, label.col = 1
                                               HarmonicMean = Hm,
                                               F.Measure   = confusion.res$byClass[7],
                                               MCC         = MCC,
-                                              Kappa       = confusion.res$overall[2])
-
+                                              Kappa       = confusion.res$overall[2],
+                                              npv         = confusion.res$byClass[3], #Seager
+                                              recall      = confusion.res$byClass[1],
+                                              precision   = confusion.res$byClass[4],
+                                              AUC = res.auc)
         }, datasets = datasets, all_folds = all_folds, positive.class = positive.class, ntree = ntree)
 
         Ave.res <- apply(perf.res, 1, as.numeric)
         Ave.res <- as.data.frame(t(Ave.res))
+
         Ave.res$Ave.Res <- rowMeans(Ave.res)
+        Ave.res$Var.Res <- apply(Ave.res[, -ncol(Ave.res)], 1, var)
         Ave.res
 }
 
