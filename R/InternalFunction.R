@@ -1008,7 +1008,11 @@ Internal.randomForest_tune <- function(datasets = list(), label.col = 1,
 
         all_folds <- lapply(datasets, function(x) {
                 set.seed(seed)
+                if (is.null(group)){
                 folds <- caret::createFolds(x$label, k = folds.num, returnTrain = TRUE)
+                        } else { 
+                        folds <- caret::groupKFold(group, k = folds.num)
+                        }
         })
 
         if (is.null(positive.class)) {
