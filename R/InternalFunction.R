@@ -999,7 +999,7 @@ Internal.randomForest_tune <- function(datasets = list(), label.col = 1,
                                        ntree = 3000,
                                        mtry.ratios = c(0.1, 0.2, 0.4, 0.6, 0.8),
                                        seed = 1, return.model = TRUE,
-                                       parallel.cores = 2, ...) {
+                                       parallel.cores = 2, group = NULL, ...) {
 
         for (i in 1:length(datasets)) {
                 names(datasets[[i]])[[label.col]] <- "label"
@@ -1011,7 +1011,7 @@ Internal.randomForest_tune <- function(datasets = list(), label.col = 1,
                 if (is.null(group)){
                 folds <- caret::createFolds(x$label, k = folds.num, returnTrain = TRUE)
                         } else { 
-                        folds <- caret::groupKFold(group, k = folds.num)
+                        folds <- caret::groupKFold(group, k = folds.num) #Seager
                         }
         })
 
