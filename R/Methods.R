@@ -327,7 +327,7 @@ run_lncPro <- function(seqRNA, seqPro, mode = c("prediction", "retrain", "featur
                                                               ntree = ntree,
                                                               mtry.ratios = mtry.ratios,
                                                               seed = seed, return.model = TRUE,
-                                                              parallel.cores = parallel.cores, ...)
+                                                              parallel.cores = parallel.cores, group = NULL, ...)
                 message("\n", "+ Completed.  ", Sys.time())
                 return(retrained.model)
         }
@@ -577,7 +577,7 @@ run_RPISeq <- function(seqRNA, seqPro, mode = c("prediction", "retrain", "featur
                                                               ntree = ntree,
                                                               mtry.ratios = mtry.ratios,
                                                               seed = seed, return.model = TRUE,
-                                                              parallel.cores = parallel.cores, ...)
+                                                              parallel.cores = parallel.cores, group = NULL, ...)
                 message("\n", "+ Completed.  ", Sys.time())
                 return(retrained.model)
         }
@@ -786,7 +786,7 @@ run_rpiCOOL <- function(seqRNA, seqPro, mode = c("prediction", "retrain", "featu
                                                               ntree = ntree,
                                                               mtry.ratios = mtry.ratios,
                                                               seed = seed, return.model = TRUE,
-                                                              parallel.cores = parallel.cores, ...)
+                                                              parallel.cores = parallel.cores, group = NULL, ...)
                 message("\n", "+ Completed.  ", Sys.time())
                 return(retrained.model)
         }
@@ -1002,7 +1002,7 @@ run_LncADeep <- function(seqRNA, seqPro, mode = c("prediction", "retrain", "feat
                                                               ntree = ntree,
                                                               mtry.ratios = mtry.ratios,
                                                               seed = seed, return.model = TRUE,
-                                                              parallel.cores = parallel.cores, ...)
+                                                              parallel.cores = parallel.cores, group = NULL, ...)
                 message("\n", "+ Completed.  ", Sys.time())
                 return(retrained.model)
         }
@@ -1230,7 +1230,7 @@ run_LION <- function(seqRNA, seqPro, mode = c("prediction", "retrain", "feature"
                                                               ntree = ntree,
                                                               mtry.ratios = mtry.ratios,
                                                               seed = seed, return.model = TRUE,
-                                                              parallel.cores = parallel.cores, ...)
+                                                              parallel.cores = parallel.cores, group = NULL, ...)
                 message("\n", "+ Completed.  ", Sys.time())
                 return(retrained.model)
         }
