@@ -965,7 +965,7 @@ Internal.randomForest_CV <- function(datasets = list(), all_folds, label.col = 1
                 ###################################
                 #AUC by Seager
                 roc_obj <- pROC::roc(testSet$label, res, levels = c(setdiff(testSet$label, positive.class), positive.class), direction="<") #levels=(negative, positive)
-                res.auc <- pROC::auc(roc_obj)
+                res.auc <- as.numeric(pROC::auc(roc_obj))
                 ###################################
                 confusion.res <- caret::confusionMatrix(data.frame(res)[,1], testSet$label,
                                                         positive = positive.class,
