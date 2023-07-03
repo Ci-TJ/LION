@@ -171,7 +171,7 @@ run_lncPro <- function(seqRNA, seqPro, mode = c("prediction", "retrain", "featur
                        prediction = c("original", "retrained"), retrained.model = NULL,
                        label = NULL, positive.class = NULL, folds.num = 10,
                        ntree = 3000, mtry.ratios = c(0.1, 0.2, 0.4, 0.6, 0.8), seed = 1,
-                       parallel.cores = 2, cl = NULL, ...) {
+                       parallel.cores = 2, cl = NULL, return.model = TRUE, ...) {
 
         mode <- match.arg(mode, choices = c("prediction", "retrain", "feature"))
         prediction <- match.arg(prediction)
@@ -326,7 +326,7 @@ run_lncPro <- function(seqRNA, seqPro, mode = c("prediction", "retrain", "featur
                                                               positive.class = positive.class, folds.num = folds.num,
                                                               ntree = ntree,
                                                               mtry.ratios = mtry.ratios,
-                                                              seed = seed, return.model = TRUE,
+                                                              seed = seed, return.model = return.model,
                                                               parallel.cores = parallel.cores, group = NULL, ...)
                 message("\n", "+ Completed.  ", Sys.time())
                 return(retrained.model)
@@ -456,7 +456,7 @@ run_RPISeq <- function(seqRNA, seqPro, mode = c("prediction", "retrain", "featur
                        prediction = c("web", "retrained"), retrained.model = NULL,
                        label = NULL, positive.class = NULL, folds.num = 10,
                        ntree = 3000, mtry.ratios = c(0.1, 0.2, 0.4, 0.6, 0.8), seed = 1,
-                       parallel.cores = 2, cl = NULL, ...) {
+                       parallel.cores = 2, cl = NULL, return.model = TRUE, ...) {
 
         mode <- match.arg(mode, choices = c("prediction", "retrain", "feature"))
         prediction <- match.arg(prediction)
@@ -576,7 +576,7 @@ run_RPISeq <- function(seqRNA, seqPro, mode = c("prediction", "retrain", "featur
                                                               positive.class = positive.class, folds.num = folds.num,
                                                               ntree = ntree,
                                                               mtry.ratios = mtry.ratios,
-                                                              seed = seed, return.model = TRUE,
+                                                              seed = seed, return.model = return.model,
                                                               parallel.cores = parallel.cores, group = NULL, ...)
                 message("\n", "+ Completed.  ", Sys.time())
                 return(retrained.model)
@@ -696,7 +696,7 @@ run_RPISeq <- function(seqRNA, seqPro, mode = c("prediction", "retrain", "featur
 run_rpiCOOL <- function(seqRNA, seqPro, mode = c("prediction", "retrain", "feature"),
                         retrained.model = NULL, label = NULL, positive.class = NULL,
                         folds.num = 10, ntree = 3000, mtry.ratios = c(0.1, 0.2, 0.4, 0.6, 0.8),
-                        seed = 1, parallel.cores = 2, cl = NULL, ...) {
+                        seed = 1, parallel.cores = 2, cl = NULL, return.model = TRUE, ...) {
 
         mode <- match.arg(mode, choices = c("prediction", "retrain", "feature"))
         if (length(seqRNA) != length(seqPro)) stop("The number of RNA sequences should match the number of protein sequences!")
@@ -785,7 +785,7 @@ run_rpiCOOL <- function(seqRNA, seqPro, mode = c("prediction", "retrain", "featu
                                                               positive.class = positive.class, folds.num = folds.num,
                                                               ntree = ntree,
                                                               mtry.ratios = mtry.ratios,
-                                                              seed = seed, return.model = TRUE,
+                                                              seed = seed, return.model = return.model,
                                                               parallel.cores = parallel.cores, group = NULL, ...)
                 message("\n", "+ Completed.  ", Sys.time())
                 return(retrained.model)
@@ -909,7 +909,7 @@ run_rpiCOOL <- function(seqRNA, seqPro, mode = c("prediction", "retrain", "featu
 run_LncADeep <- function(seqRNA, seqPro, mode = c("prediction", "retrain", "feature"),
                         retrained.model = NULL, label = NULL, positive.class = NULL,
                         folds.num = 10, ntree = 3000, mtry.ratios = c(0.1, 0.2, 0.4, 0.6, 0.8),
-                        seed = 1, parallel.cores = 2, cl = NULL, ...) {
+                        seed = 1, parallel.cores = 2, cl = NULL, return.model = TRUE, ...) {
 
         mode <- match.arg(mode, choices = c("prediction", "retrain", "feature"))
         if (length(seqRNA) != length(seqPro)) stop("The number of RNA sequences should match the number of protein sequences!")
@@ -1001,7 +1001,7 @@ run_LncADeep <- function(seqRNA, seqPro, mode = c("prediction", "retrain", "feat
                                                               positive.class = positive.class, folds.num = folds.num,
                                                               ntree = ntree,
                                                               mtry.ratios = mtry.ratios,
-                                                              seed = seed, return.model = TRUE,
+                                                              seed = seed, return.model = return.model,
                                                               parallel.cores = parallel.cores, group = NULL, ...)
                 message("\n", "+ Completed.  ", Sys.time())
                 return(retrained.model)
@@ -1124,7 +1124,7 @@ run_LncADeep <- function(seqRNA, seqPro, mode = c("prediction", "retrain", "feat
 run_LION <- function(seqRNA, seqPro, mode = c("prediction", "retrain", "feature"),
                        retrained.model = NULL, label = NULL,  positive.class = NULL,
                        folds.num = 10, ntree = 3000, mtry.ratios = c(0.1, 0.2, 0.4, 0.6, 0.8),
-                       seed = 1, parallel.cores = 2, cl = NULL, ...) {
+                       seed = 1, parallel.cores = 2, cl = NULL, return.model = TRUE, ...) {
 
         mode <- match.arg(mode, choices = c("prediction", "retrain", "feature"))
         if (length(seqRNA) != length(seqPro)) stop("The number of RNA sequences should match the number of protein sequences!")
@@ -1229,7 +1229,7 @@ run_LION <- function(seqRNA, seqPro, mode = c("prediction", "retrain", "feature"
                                                               positive.class = positive.class, folds.num = folds.num,
                                                               ntree = ntree,
                                                               mtry.ratios = mtry.ratios,
-                                                              seed = seed, return.model = TRUE,
+                                                              seed = seed, return.model = return.model,
                                                               parallel.cores = parallel.cores, group = NULL, ...)
                 message("\n", "+ Completed.  ", Sys.time())
                 return(retrained.model)
