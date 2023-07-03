@@ -962,10 +962,11 @@ Internal.randomForest_CV <- function(datasets = list(), all_folds, label.col = 1
                 RF_mod <- randomForest::randomForest(label ~ ., data = trainSet,
                                                      ntree = ntree, ...)
                 res <- predict(RF_mod, testSet, type = "response")
+                ###################################
                 #AUC by Seager
-                roc_obj <- pROC::roc(testSet$label, res, levels = c(positive.class, "other"))
-                res.auc <- pROCauc(roc_obj)
-                
+                roc_obj <- pROC::roc(testSet$label, res, levels = c(setdiff(testSet$label, positive.class), positive.class), direction="<") #levels=(negative, positive)
+                res.auc <- pROC::auc(roc_obj)
+                ###################################
                 confusion.res <- caret::confusionMatrix(data.frame(res)[,1], testSet$label,
                                                         positive = positive.class,
                                                         mode = "everything")
@@ -987,16 +988,17 @@ Internal.randomForest_CV <- function(datasets = list(), all_folds, label.col = 1
                 # MCC <- ((TP * TN) - (FP * FN)) / sqrt((TP + FP) * (TP + FN) * (TN + FP) * (TN + FN))
 
                 performance.res <- data.frame(TP = TP, TN = TN, FP = FP, FN = FN,
-                                              Sensitivity = confusion.res$byClass[1],
+                                              Sensitivity = confusion.res$byClass[1], #recall
                                               Specificity = confusion.res$byClass[2],
                                               Accuracy    = confusion.res$overall[1],
                                               HarmonicMean = Hm,
                                               F.Measure   = confusion.res$byClass[7],
                                               MCC         = MCC,
                                               Kappa       = confusion.res$overall[2],
-                                              npv         = confusion.res$byClass[3], #Seager
+                                              npv         = confusion.res$byClass[4], #Seager
+                                              ppv         = confusion.res$byClass[3], #precision
                                               recall      = confusion.res$byClass[1],
-                                              precision   = confusion.res$byClass[4],
+                                              precision   = confusion.res$byClass[3],
                                               AUC = res.auc)
         }, datasets = datasets, all_folds = all_folds, positive.class = positive.class, ntree = ntree)
 
