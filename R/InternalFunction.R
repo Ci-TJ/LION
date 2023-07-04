@@ -1063,8 +1063,8 @@ Internal.randomForest_tune <- function(datasets = list(), label.col = 1,
                 #mtry_perf <- t(mtry_res[folds.num + 1])
                 mean_perf <- tidytable::as_tidytable(t(mtry_res[folds.num + 1]))
                 var_perf <- tidytable::as_tidytable(t(mtry_res[folds.num + 1]))
-                mtry_perf <- var_perf %>% tidytable::mutate(across(everything(), ~ paste(mean_perf[[cur_column()]], "(", .x, ")", sep = ""))) %>% data.frame() #unite the mean and var performences
-                
+                #mtry_perf <- var_perf %>% tidytable::mutate(across(everything(), ~ paste(mean_perf[[cur_column()]], "(", .x, ")", sep = ""))) %>% data.frame() #unite the mean and var performences
+		mtry_perf <- var_perf %>% tidytable::mutate(tidytable::across(tidyselect::everything(), ~ paste(mean_perf[[tidytable::cur_column()]], "(", .x, ")", sep = ""))) %>% data.frame() #unite the mean and var performences
                 row.names(mtry_perf) <- paste0("mtryRatio_", mtry.ratio)
                 perf_tune <- rbind(perf_tune, mtry_perf)
                 # print(mtry_perf)
