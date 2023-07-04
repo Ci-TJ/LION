@@ -941,7 +941,7 @@ Internal.get_RPISeqWeb_res <- function(onePro, oneRNA) {
 
 Internal.randomForest_CV <- function(datasets = list(), all_folds, label.col = 1,
                                      positive.class = NULL, ntree = 1500,
-                                     folds.num = folds.num, cl, ...) {
+                                     folds.num = folds.num, threshold = 0.5, direction = "<", cl, ...) {
 
         perf.res <- parallel::parSapply(cl, 1:folds.num, function(x, datasets,
                                                                   all_folds,
@@ -961,13 +961,22 @@ Internal.randomForest_CV <- function(datasets = list(), all_folds, label.col = 1
 
                 RF_mod <- randomForest::randomForest(label ~ ., data = trainSet,
                                                      ntree = ntree, ...)
-                res <- predict(RF_mod, testSet, type = "response")
+                res <- predict(RF_mod, testSet, type = "prob")
+                threshold <- threshold # 设置阈值，可以根据实际情况调整
+	        neg.class <- setdiff(testSet$label, positive.class)
+	        class.level <- c(neg.class, positive.class)
+	        predicted.classes <- factor(ifelse(res[,2] > threshold, colnames(res)[2], colnames(res)[1]), levels=class.level)
                 ###################################
+                predictor <- c()
+	        for (i in 1:length(testSet$label)){
+                        tmp <- res[i,testSet$label[i]]
+   		        predictor <- c(predictor , tmp)
+	        }
                 #AUC by Seager
-                roc_obj <- pROC::roc(testSet$label, res, levels = c(setdiff(testSet$label, positive.class), positive.class), direction="<") #levels=(negative, positive)
+                roc_obj <- pROC::roc(factor(testSet$label, levels=class.level), as.numeric(predictor), levels = class.level, direction = direction) #levels=(negative, positive), direction="<"
                 res.auc <- as.numeric(pROC::auc(roc_obj))
                 ###################################
-                confusion.res <- caret::confusionMatrix(data.frame(res)[,1], testSet$label,
+                confusion.res <- caret::confusionMatrix(predicted.classes, factor(testSet$label, levels=class.level),
                                                         positive = positive.class,
                                                         mode = "everything")
                 confusion.tab <- confusion.res$table
@@ -1015,7 +1024,7 @@ Internal.randomForest_tune <- function(datasets = list(), label.col = 1,
                                        ntree = 3000,
                                        mtry.ratios = c(0.1, 0.2, 0.4, 0.6, 0.8),
                                        seed = 1, return.model = TRUE,
-                                       parallel.cores = 2, group = NULL, ...) {
+                                       parallel.cores = 2, group = NULL, threshold = 0.5, direction = "<", ...) {
 
         for (i in 1:length(datasets)) {
                 names(datasets[[i]])[[label.col]] <- "label"
@@ -1050,8 +1059,12 @@ Internal.randomForest_tune <- function(datasets = list(), label.col = 1,
                 mtry_res <- Internal.randomForest_CV(datasets = datasets, label.col = label.col,
                                                      positive.class = positive.class, mtry = mtry,
                                                      folds.num = folds.num, all_folds = all_folds,
-                                                     ntree = ntree, cl = cl, ...)
-                mtry_perf <- t(mtry_res[folds.num + 1])
+                                                     ntree = ntree, threshold = threshold, direction = direction, cl = cl, ...)
+                #mtry_perf <- t(mtry_res[folds.num + 1])
+                mean_perf <- tidytable::as_tidytable(t(mtry_res[folds.num + 1]))
+                var_perf <- tidytable::as_tidytable(t(mtry_res[folds.num + 1]))
+                mtry_perf <- var_perf %>% tidytable::mutate(across(everything(), ~ paste(mean_perf[[cur_column()]], "(", .x, ")", sep = ""))) %>% data.frame() #unite the mean and var performences
+                
                 row.names(mtry_perf) <- paste0("mtryRatio_", mtry.ratio)
                 perf_tune <- rbind(perf_tune, mtry_perf)
                 # print(mtry_perf)
@@ -1059,7 +1072,14 @@ Internal.randomForest_tune <- function(datasets = list(), label.col = 1,
         }
         parallel::stopCluster(cl)
 
-        output <- mtry.ratios[which.max(perf_tune$Accuracy)]
+        #output <- mtry.ratios[which.max(perf_tune$Accuracy)]
+        # 使用apply函数，对df的第一列应用extract_value函数，并返回一个向量
+        select_value <- apply(mtry.ratios[, "Accuracy", drop = FALSE], 1, extract_value)
+        # 然后找出select_value向量的最大值
+        max_value <- max(select_value)
+        # 最后筛选出select_value等于最大值的行
+        output <- mtry.ratios[select_value == max_value, ][1, ] #add [1,] to avoid same acc
+        
         message("- Optimal mtryRatio: ", output)
         mtry_optimal <- floor((ncol(datasets[[1]]) - 1) * output)
 
@@ -1073,6 +1093,11 @@ Internal.randomForest_tune <- function(datasets = list(), label.col = 1,
         }
         output
 }
+
+# 假# 定义一个函数，用来提取括号外的数值
+extract_value <- function(x) {
+        as.numeric(gsub("\\(.*\\)", "", x))
+        }
 
 Internal.checkNa <- function(dataset) {
         # dataset[is.na(dataset)] <- 0
