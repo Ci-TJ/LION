@@ -939,6 +939,11 @@ Internal.get_RPISeqWeb_res <- function(onePro, oneRNA) {
         res
 }
 
+# 假# 定义一个函数，用来提取括号外的数值
+extract_value <- function(x) {
+        as.numeric(gsub("\\(.*\\)", "", x))
+        }
+
 Internal.randomForest_CV <- function(datasets = list(), all_folds, label.col = 1,
                                      positive.class = NULL, ntree = 1500,
                                      folds.num = folds.num, threshold = 0.5, direction = "<", cl, ...) {
@@ -1067,8 +1072,8 @@ Internal.randomForest_tune <- function(datasets = list(), label.col = 1,
                 #mtry_perf <- var_perf %>% tidytable::mutate(across(everything(), ~ paste(mean_perf[[cur_column()]], "(", .x, ")", sep = ""))) %>% data.frame() #unite the mean and var performences
 		#mtry_perf <- var_perf %>% tidytable::mutate(tidytable::across(tidyselect::everything(), ~ paste(mean_perf[[tidytable::cur_column()]], "(", .x, ")", sep = ""))) %>% data.frame() #unite the mean and var performences
                 ##########################
-		mean_perf <- t(mtry_res[folds.num + 1])
-                var_perf <- t(mtry_res[folds.num + 2]) #Note 2
+		mean_perf <- round(t(mtry_res[folds.num + 1]), digits = 4)
+                var_perf <- round(t(mtry_res[folds.num + 2]), digits = 2) #Note 2
 		mtry_perf <- paste(mean_perf, "(", var_perf, ")", sep = "")
 		mtry_perf <- data.frame(matrix(mtry_perf, nrow = nrow(mean_perf)))
 		colnames(mtry_perf) <- colnames(mean_perf)
@@ -1076,13 +1081,13 @@ Internal.randomForest_tune <- function(datasets = list(), label.col = 1,
 		row.names(mtry_perf) <- paste0("mtryRatio_", mtry.ratio)
                 perf_tune <- rbind(perf_tune, mtry_perf)
                 # print(mtry_perf)
-                print(round(mtry_perf, digits = 4)[,-c(1:4)])
+                print(mtry_perf[,-c(1:4)])
         }
         parallel::stopCluster(cl)
 
         #output <- mtry.ratios[which.max(perf_tune$Accuracy)]
         # 使用apply函数，对df的第一列应用extract_value函数，并返回一个向量
-        select_value <- apply(mtry.ratios[, "Accuracy", drop = FALSE], 1, extract_value)
+        select_value <- apply(mtry.ratios[, 3, drop = FALSE], 1, extract_value) # 3 is for Accuracy
         # 然后找出select_value向量的最大值
         max_value <- max(select_value)
         # 最后筛选出select_value等于最大值的行
@@ -1101,11 +1106,6 @@ Internal.randomForest_tune <- function(datasets = list(), label.col = 1,
         }
         output
 }
-
-# 假# 定义一个函数，用来提取括号外的数值
-extract_value <- function(x) {
-        as.numeric(gsub("\\(.*\\)", "", x))
-        }
 
 Internal.checkNa <- function(dataset) {
         # dataset[is.na(dataset)] <- 0
