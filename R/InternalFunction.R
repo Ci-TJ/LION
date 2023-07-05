@@ -1061,11 +1061,19 @@ Internal.randomForest_tune <- function(datasets = list(), label.col = 1,
                                                      folds.num = folds.num, all_folds = all_folds,
                                                      ntree = ntree, threshold = threshold, direction = direction, cl = cl, ...)
                 #mtry_perf <- t(mtry_res[folds.num + 1])
-                mean_perf <- tidytable::as_tidytable(t(mtry_res[folds.num + 1]))
-                var_perf <- tidytable::as_tidytable(t(mtry_res[folds.num + 1]))
+		##########################
+                #mean_perf <- tidytable::as_tidytable(t(mtry_res[folds.num + 1]))
+                #var_perf <- tidytable::as_tidytable(t(mtry_res[folds.num + 2])) #Note 2
                 #mtry_perf <- var_perf %>% tidytable::mutate(across(everything(), ~ paste(mean_perf[[cur_column()]], "(", .x, ")", sep = ""))) %>% data.frame() #unite the mean and var performences
-		mtry_perf <- var_perf %>% tidytable::mutate(tidytable::across(tidyselect::everything(), ~ paste(mean_perf[[tidytable::cur_column()]], "(", .x, ")", sep = ""))) %>% data.frame() #unite the mean and var performences
-                row.names(mtry_perf) <- paste0("mtryRatio_", mtry.ratio)
+		#mtry_perf <- var_perf %>% tidytable::mutate(tidytable::across(tidyselect::everything(), ~ paste(mean_perf[[tidytable::cur_column()]], "(", .x, ")", sep = ""))) %>% data.frame() #unite the mean and var performences
+                ##########################
+		mean_perf <- t(mtry_res[folds.num + 1])
+                var_perf <- t(mtry_res[folds.num + 2]) #Note 2
+		mtry_perf <- paste(mean_perf, "(", var_perf, ")", sep = "")
+		mtry_perf <- data.frame(matrix(mtry_perf, nrow = nrow(mean_perf)))
+		colnames(mtry_perf) <- colnames(mean_perf)
+
+		row.names(mtry_perf) <- paste0("mtryRatio_", mtry.ratio)
                 perf_tune <- rbind(perf_tune, mtry_perf)
                 # print(mtry_perf)
                 print(round(mtry_perf, digits = 4)[,-c(1:4)])
