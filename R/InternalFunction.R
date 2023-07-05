@@ -1085,14 +1085,7 @@ Internal.randomForest_tune <- function(datasets = list(), label.col = 1,
         }
         parallel::stopCluster(cl)
 
-        #output <- mtry.ratios[which.max(perf_tune$Accuracy)]
-        # 使用apply函数，对df的第一列应用extract_value函数，并返回一个向量
-        select_value <- apply(mtry.ratios[, 3, drop = FALSE], 1, extract_value) # 3 is for Accuracy
-        # 然后找出select_value向量的最大值
-        max_value <- max(select_value)
-        # 最后筛选出select_value等于最大值的行
-        output <- mtry.ratios[select_value == max_value, ][1, ] #add [1,] to avoid same acc
-        
+        output <- mtry.ratios[which.max(perf_tune$Accuracy)]
         message("- Optimal mtryRatio: ", output)
         mtry_optimal <- floor((ncol(datasets[[1]]) - 1) * output)
 
